@@ -66,3 +66,8 @@ somewhere in my `$PATH` to this file:
 And voilà!, you can now tab-complete hostnames and connect immediately. Tie
 this together with some key-based login and `ssh_config` configuration
 (for username, identity, etc) and the pain goes right away :)
+
+
+__TODO__ Finish these docs!!
+
+
