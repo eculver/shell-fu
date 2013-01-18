@@ -1,0 +1,79 @@
+#!/bin/bash
+#
+# This is a simple wrapper for generating commands for executables within a
+# python virtualenv.
+#
+# Usage: virtenv.sh env-name command [arg, arg, ...]
+#
+#   env-name    The name of the virtualenv for the command to be run in.
+#   command     The command within the virtualenv's path to be run. The base path is usually $VIRTUALENV_HOME/$VIRTUALENV/bin.
+#   arg         Any remaining arguments are passed to the command itself.
+#
+# Example:
+#
+# ./virtenv myapp pip install -r /some/path/to/requirements.txt
+#
+# is the same as running:
+#
+# $VIRTUALENV_HOME/myapp/bin/pip install -r /some/path/to/requirements.txt
+
+
+print_usage()
+{
+    echo "Usage: `basename $0` env-name command [arg, arg...]"
+    echo
+    echo "A simple wrapper for generating commands to be run within a python virtualenv."
+    echo
+    echo -e "\tenv-name\tThe name of the virtualenv for the command to be run in."
+    echo -e "\tcommand\t\tThe command within the virtualenv's path to be run. The base path is usually \$VIRTUALENV_HOME/\$VIRTUALENV/bin."
+    echo -e "\targ\t\tAny remaining arguments are passed to the command itself."
+    echo
+    echo "Example:"
+    echo
+    echo "./virtenv myapp pip install -r /some/path/to/requirements.txt"
+    echo
+    echo "is the same as running:"
+    echo
+    echo "\$VIRTUALENV_HOME/myapp/bin/pip install -r /some/path/to/requirements.txt"
+    echo
+    exit 1;
+}
+
+[[ "$#" -lt 2 ]] && print_usage
+
+while getopts ":h" OPT ; do
+    case $OPT in
+        h)
+            print_usage
+            ;;
+    esac
+done
+
+
+# stash args
+env=$1
+cmd=$2
+
+# pop of first two
+shift
+shift
+
+VENV=~/.virtualenvs/$env
+CMD=$VENV/bin/$cmd
+
+if [ ! -d $VENV ] ; then
+    echo "Could not find virtualenv: $env"
+    exit 1
+fi
+
+if [ ! -e $CMD ] ; then
+    echo "Command not found: $cmd"
+    exit 1
+fi
+
+if [ ! -x $CMD ] ; then
+    echo "Command not executable: $cmd"
+    exit 1
+fi
+
+${CMD} "${@}"
